@@ -12,53 +12,65 @@ export function launch(port) {
 
       const [command, ...args] = message.trim().split(" ");
       console.log(command, args);
-      switch(command) {
-        case "USER":
-          const username = JSON.parse(fs.readFileSync("C:/Users/lucas/OneDrive/Bureau/myftp/my-ftp-live/server/src/users.json","utf-8"));
-          
-          username.forEach(element => { 
-            if (element.name == args[0]){
-              socket.write("Connected");
-              }
-               else{
-              socket.write("Disconnected");
-              }
-
+      switch (command) {
+        case "USER": //Check if the user given exist
+          const username = JSON.parse(fs.readFileSync("C:/Users/lucas/OneDrive/Bureau/myftp/my-ftp-live/server/src/users.json"));
+          let auth = false;
+          username.forEach(element => {
+            if (element.name == args[0]) {
+              socket.write("Connected\r\n");
+              auth = true;
+            }
+            else if (auth == false && element.name != args[0]) {
+              socket.write("Disconnected\r\n");
+            }
           });
-          socket.write("230 User logged in, proceed.\r\n");
           break;
-        case "PASS":
-          const password = JSON.parse(fs.readFileSync("C:/Users/lucas/OneDrive/Bureau/myftp/my-ftp-live/server/src/users.json","utf-8"));
-
+        case "PASS": //Check if the password given is the same as the connected user
+          const password = JSON.parse(fs.readFileSync("C:/Users/lucas/OneDrive/Bureau/myftp/my-ftp-live/server/src/users.json"));
+          let auth_pass = false;
           password.forEach(element => {
-            if (element.password == args[1]){
-              socket.write("Connected");
+            if (element.password == args[0]) {
+              socket.write("Same password\r\n");
+              auth_pass = true;
             }
-            else{
-              socket.write("Disconnected");
+            else if (auth_pass == false && element.password != args[0]) {
+              socket.write("WRONG\r\n");
             }
           });
-          socket.write("HDUOEZIJFUH")
           break;
-        case "LIST":
-          break;
-        case "CWD":
+        case "LIST": //List all the files in the current directory
           try {
-          process.chdir(args[0]);
-          socket.write(`250,${process.cwd()}\r\n`);
-          break;
+            let list = "";
+            let loc = fs.readdirSync(process.cwd());
+            loc.forEach((file) => {
+              list += file + "\r\n";
+            });
+            socket.write("Current directory filenames: \r\n" + list);
+          } catch (e) {
+            console.log(e);
+            socket.write("Couldn't display current directory's listing, please try again.\r\n");
           }
-          catch(err){
+          break;
+        case "CWD": //Change the actual directory
+          try {
+            process.chdir(args[0]);
+            socket.write(`250,${process.cwd()}\r\n`);
+            break;
+          }
+          catch (err) {
             socket.write("The directory does not exist")
           }
         case "RETR":
+          socket.write("Copying the file from the server to the client.\r\n");
           break;
         case "STOR":
+          socket.write("Copying the file from the client to the server.\r\n");
           break;
-        case "PWD":
+        case "PWD": //Give the actual directory
           socket.write(`257,${process.cwd()}\r\n`);
           break;
-        case "HELP":
+        case "HELP": //Give some useful informations
           socket.write("USER <username>: check if the user exist.\r\n" +
             "PASS <password>: authenticate the user with a password.\r\n" +
             "LIST: list the current directory of the server.\r\n" +
