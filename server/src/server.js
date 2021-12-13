@@ -13,18 +13,20 @@ export function launch(port) {
       const [command, ...args] = message.trim().split(" ");
       console.log(command, args);
       switch (command) {
-        case "USER": //Check if the user given exist
+        case "USER": //Check if the given user exist
           const username = JSON.parse(fs.readFileSync("C:/Users/lucas/OneDrive/Bureau/myftp/my-ftp-live/server/src/users.json"));
           let auth = false;
           username.forEach(element => {
             if (element.name == args[0]) {
-              socket.write("Connected\r\n");
               auth = true;
             }
-            else if (auth == false && element.name != args[0]) {
-              socket.write("Disconnected\r\n");
-            }
           });
+          if (auth == true){
+            socket.write("This user exist.\r\n");
+          }
+          else {
+            socket.write("This user does not exist");
+          }
           break;
         case "PASS": //Check if the password given is the same as the connected user
           const password = JSON.parse(fs.readFileSync("C:/Users/lucas/OneDrive/Bureau/myftp/my-ftp-live/server/src/users.json"));
@@ -46,10 +48,10 @@ export function launch(port) {
             loc.forEach((file) => {
               list += file + "\r\n";
             });
-            socket.write("Current directory filenames: \r\n" + list);
+            socket.write("Filenames: \r\n" + list);
           } catch (e) {
             console.log(e);
-            socket.write("Couldn't display current directory's listing, please try again.\r\n");
+            socket.write("There was an error while trying to show the filenames of the directory, please try again.\r\n");
           }
           break;
         case "CWD": //Change the actual directory
