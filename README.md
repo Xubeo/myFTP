@@ -20,17 +20,16 @@ myFTP uses JavaScript, Babel and nodemon.
 
 ## Installation
 
-Dillinger requires [Node.js](https://nodejs.org/) v14+ to run.
+This project requires [Node.js](https://nodejs.org/) v14+ to run.
 
 To install the dependencies, you'll need to use ``npm install`` in the client folder AND the server folder.
 
 ```sh
 npm install
 ```
-To run the project, you can use serveral commands:
+To run the project, you can use :
 ```sh
-npm run dev #For a dev environment
-npm run start #Best perfomances
+npm run dev
 ```
 
 ## Commands
