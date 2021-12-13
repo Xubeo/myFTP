@@ -1,7 +1,4 @@
-import { readFile } from "fs";
 import { createServer } from "net";
-import { exit } from "process";
-import { fs } from "fs";
 import { user } from "./functions/user";
 import { list } from "./functions/list";
 import { cwd } from "./functions/cwd";
